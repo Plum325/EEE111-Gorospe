@@ -5,10 +5,11 @@ import tkinter as tk
 from tkinter import messagebox
 from KJDatabase import KJDatabase
 from tkinter import StringVar
+import csv
 
 
 class KJGuiCtk(customtkinter.CTk):
-    def __init__(self,database = KJDatabase("App.db")):
+    def __init__(self,database = KJDatabase("Items.db")):
         super().__init__()
         self.db = database
      
@@ -87,7 +88,7 @@ class KJGuiCtk(customtkinter.CTk):
 
 
         #   Product ID and Entry
-        self.itemID = self.newCtkLabel("Prd ID")
+        self.itemID = self.newCtkLabel("Ord ID")
         self.itemID.place(x=10, y=210)
         self.itemIDEntry = self.newCtkEntry(state=NORMAL)
         self.itemIDEntry.place(x=110, y=210)
@@ -128,6 +129,11 @@ class KJGuiCtk(customtkinter.CTk):
         self.exporttoJSONButton = self.newCtkButton(text='Export to JSON',
                                     onClickHandler=self.export_to_json)
         self.exporttoJSONButton.place(x=250,y=410)
+
+        #   Import Data
+        self.importButton = self.newCtkButton(text='Import Data',
+                                            onClickHandler=self.import_data)
+        self.importButton.place(x=450,y=410)
 
 
 
@@ -332,6 +338,10 @@ class KJGuiCtk(customtkinter.CTk):
             self.clear_form()
             messagebox.showinfo('Success', 'Data has been deleted')
 
+    #   Import Command
+    def import_data(self):
+        self.db.importCSV()
+        self.add_to_treeview()
 
     #   Update Command
     def update_entry(self):

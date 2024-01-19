@@ -1,5 +1,6 @@
 from KJEntry import KJEntry
 import json
+import csv
 
 class KJMainFunctions:    
 
@@ -30,15 +31,12 @@ class KJMainFunctions:
         return itemName in self.database.keys()
     
     def export_csv(self):
-        with open(self.dbName, "w") as filehandle:
+        with open("Items.csv", "w", newline='') as filehandle:
+            csv_writer = csv.writer(filehandle)
+            csv_writer.writerow(['Item Name', 'Price', 'Amount', 'Status', 'Order ID'])
             dbEntries = self.fetch_items()
             for entry in dbEntries:
-                filehandle.write(f"Order ID: {entry[4]}\n"
-                                 f"Item Name: {entry[0]}\n"
-                                 f"Price: {entry[1]}\n"
-                                 f"No of Items: {entry[2]}\n"
-                                 f"Status: {entry[3]}\n\n"
-                                 )
+                csv_writer.writerow([entry[0], entry[1], entry[2], entry[3], entry[4]])
                 
     def export_json(self, filename="data.json"):
         items = self.fetch_items()
@@ -56,4 +54,19 @@ class KJMainFunctions:
         with open(filename, 'w') as json_file:
             json.dump(json_data, json_file, indent=2)
 
+    def importCSV(self, filename="Items.csv"):
+        try:
+            with open(filename, 'r') as file:
+                csv_reader = csv.DictReader(file)
+                for row in csv_reader:
+                    item_name = row['Item Name'].strip()
+                    price = row['Price'].strip()
+                    amount = row['Amount'].strip()
+                    status = row['Status'].strip()
+                    order_id = row['Order ID'].strip()
 
+                    self.insert_items(item_name, price, amount, status, order_id)
+        except FileNotFoundError:
+            print('CSV file not found')
+        except Exception as e:
+            print(f'Error reading CSV file: {str(e)}')
